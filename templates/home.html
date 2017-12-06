@@ -21,28 +21,32 @@ If you reached this page it probably means Operation Dragonslayer is alreaady ha
    (See FAQ for more info)
 </pre>
 
-<h3>1H pumpers</h3>
+<h3>Pumpers and dumpers</h3>
+The % change of ALTS is computed by the actual change minus % change of BTC.
+
+<h4>1H pumpers</43>
 <pre class="1h-pump" style="text-align: left;">
 </pre>
-<h3>1H dumpers</h3>
+
+<h4>1H dumpers</h4>
 <pre class="1h-dump" style="text-align: left;">
 </pre>
 
-<h3>24H pumpers</h3>
+<h4>24H pumpers</h4>
 <pre class="24h-pump" style="text-align: left;">
 </pre>
-<h3>24H dumpers</h3>
+
+<h4>24H dumpers</h4>
 <pre class="24h-dump" style="text-align: left;">
 </pre>
 
-<h3>7D pumpers</h3>
+<h4>7D pumpers</h4>
 <pre class="7d-pump" style="text-align: left;">
 </pre>
-<h3>7D dumpers</h3>
+
+<h4>7D dumpers</h4>
 <pre class="7d-dump" style="text-align: left;">
 </pre>
-
-
 
 </div>
 
@@ -56,7 +60,7 @@ $(function() {
         $.each(data, function(id, el) {
             s += el.name;
             s += " ";
-            s += "<b>" + el.change + "%</b>";
+            s += "<b>" + (Math.round(parseFloat(el.change) * 100) / 100) + "%</b>";
             s += "<br>";
         });
         
@@ -95,22 +99,22 @@ $(function() {
                     change_7d -= btc_7d;
                 }
                 
-                if (change_1h) > 5) {
+                if (change_1h > 5) {
                     pumps_1h.push({"name": el["name"], "change": change_1h});
                 }                
-                if (change_1h) < -5) {
+                if (change_1h < -5) {
                     dumps_1h.push({"name": el["name"], "change": change_1h});
                 }                                
-                if (change_24h) > 10) {
+                if (change_24h > 10) {
                     pumps_24h.push({"name": el["name"], "change": change_24h});
                 }                
-                if (change_24h) < -10) {
+                if (change_24h < -10) {
                     dumps_24h.push({"name": el["name"], "change": change_24h});
                 }                
-                if (change_7d) > 15) {
+                if (change_7d > 15) {
                     pumps_7d.push({"name": el["name"], "change": change_7d});
                 }                
-                if (change_7d) < -15) {
+                if (change_7d < -15) {
                     dumps_7d.push({"name": el["name"], "change": change_7d});
                 }                
             });
