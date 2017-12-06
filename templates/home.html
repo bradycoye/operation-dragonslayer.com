@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}The Plot to Destroy Bitcoin{% endblock %}
+
+{% block home_menu %} class="active"{%endblock%}
+
+{% block content %}
+
+<div>
+
+<h2>Operation Dragonslayer - The Plot to Destroy Bitcoin</h2>
+
+<p>
+If you reached this page it probably means Operation Dragonslayer is alreaady happening. Even though you will probably lose some of your wealth short-term, just by finding this site can help you greatly long-term.
+</p>
+
+<h3>History of events</h3>
+<pre style="text-align: left;">
+ 2017-01-01 - PRESENT
+   Pumping Bitcoin on the expense of Bitcoin Cash
+   (See FAQ for more info)
+</pre>
+
+<h3>1H pumpers</h3>
+<pre class="1h-pump" style="text-align: left;">
+</pre>
+<h3>1H dumpers</h3>
+<pre class="1h-dump" style="text-align: left;">
+</pre>
+
+<h3>24H pumpers</h3>
+<pre class="24h-pump" style="text-align: left;">
+</pre>
+<h3>24H dumpers</h3>
+<pre class="24h-dump" style="text-align: left;">
+</pre>
+
+<h3>7D pumpers</h3>
+<pre class="7d-pump" style="text-align: left;">
+</pre>
+<h3>7D dumpers</h3>
+<pre class="7d-dump" style="text-align: left;">
+</pre>
+
+
+
+</div>
+
+<script>
+
+$(function() {
+
+    function format_change(data) {
+        var s = "";
+        
+        $.each(data, function(id, el) {
+            s += el.name;
+            s += " ";
+            s += "<b>" + el.change + "%</b>";
+            s += "<br>";
+        });
+        
+        return s;
+    }
+
+    function refresh() {
+        $.getJSON("https://api.coinmarketcap.com/v1/ticker/?limit=100", function(data) {
+
+            var pumps_1h = [];
+            var dumps_1h = [];
+            var pumps_24h = [];
+            var dumps_24h = [];
+            var pumps_7d = [];
+            var dumps_7d = [];
+            
+            $.each(data, function(id, el) {
+                if (parseFloat(el["percent_change_1h"]) > 5) {
+                    pumps_1h.push({"name": el["name"], "change": el["percent_change_1h"]});
+                }                
+                if (parseFloat(el["percent_change_1h"]) < -5) {
+                    dumps_1h.push({"name": el["name"], "change": el["percent_change_1h"]});
+                }                                
+                if (parseFloat(el["percent_change_24h"]) > 10) {
+                    pumps_24h.push({"name": el["name"], "change": el["percent_change_24h"]});
+                }                
+                if (parseFloat(el["percent_change_24h"]) < -10) {
+                    dumps_24h.push({"name": el["name"], "change": el["percent_change_24h"]});
+                }                
+                if (parseFloat(el["percent_change_7d"]) > 15) {
+                    pumps_7d.push({"name": el["name"], "change": el["percent_change_7d"]});
+                }                
+                if (parseFloat(el["percent_change_7d"]) < -15) {
+                    dumps_7d.push({"name": el["name"], "change": el["percent_change_7d"]});
+                }                
+            });
+
+            $(".1h-pump").animate({opacity: 0.5}, 1000).html(format_change(pumps_1h)).animate({opacity: 1.0}, 500);
+            $(".1h-dump").animate({opacity: 0.5}, 1000).html(format_change(dumps_1h)).animate({opacity: 1.0}, 500);
+            $(".24h-pump").animate({opacity: 0.5}, 1000).html(format_change(pumps_24h)).animate({opacity: 1.0}, 500);
+            $(".24h-dump").animate({opacity: 0.5}, 1000).html(format_change(dumps_24h)).animate({opacity: 1.0}, 500);
+            $(".7d-pump").animate({opacity: 0.5}, 1000).html(format_change(pumps_7d)).animate({opacity: 1.0}, 500);
+            $(".7d-dump").animate({opacity: 0.5}, 1000).html(format_change(dumps_7d)).animate({opacity: 1.0}, 500);
+        })
+    }
+
+    refresh();
+    setInterval(refresh, 10000);
+
+})
+
+</script>
+
+{% endblock %}
