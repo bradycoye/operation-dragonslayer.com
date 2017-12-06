@@ -73,24 +73,45 @@ $(function() {
             var pumps_7d = [];
             var dumps_7d = [];
             
+            var btc_1h = 0;
+            var btc_24h = 0;
+            var btc_7d = 0;
             $.each(data, function(id, el) {
-                if (parseFloat(el["percent_change_1h"]) > 5) {
-                    pumps_1h.push({"name": el["name"], "change": el["percent_change_1h"]});
+                if (el.name == "Bitcoin") {
+                    btc_1h = parseFloat(el["percent_change_1h"]);
+                    btc_24h = parseFloat(el["percent_change_24h"]);
+                    btc_7d = parseFloat(el["percent_change_7d"]);
+                }
+            })
+            
+            $.each(data, function(id, el) {
+                change_1h = parseFloat(el["percent_change_1h"]);
+                change_24h = parseFloat(el["percent_change_24h"]);
+                change_7d = parseFloat(el["percent_change_7d"]);
+                
+                if (el.name != "Bitcoin") {
+                    change_1h -= btc_1h;
+                    change_24h -= btc_24h;
+                    change_7d -= btc_7d;
+                }
+                
+                if (change_1h) > 5) {
+                    pumps_1h.push({"name": el["name"], "change": change_1h});
                 }                
-                if (parseFloat(el["percent_change_1h"]) < -5) {
-                    dumps_1h.push({"name": el["name"], "change": el["percent_change_1h"]});
+                if (change_1h) < -5) {
+                    dumps_1h.push({"name": el["name"], "change": change_1h});
                 }                                
-                if (parseFloat(el["percent_change_24h"]) > 10) {
-                    pumps_24h.push({"name": el["name"], "change": el["percent_change_24h"]});
+                if (change_24h) > 10) {
+                    pumps_24h.push({"name": el["name"], "change": change_24h});
                 }                
-                if (parseFloat(el["percent_change_24h"]) < -10) {
-                    dumps_24h.push({"name": el["name"], "change": el["percent_change_24h"]});
+                if (change_24h) < -10) {
+                    dumps_24h.push({"name": el["name"], "change": change_24h});
                 }                
-                if (parseFloat(el["percent_change_7d"]) > 15) {
-                    pumps_7d.push({"name": el["name"], "change": el["percent_change_7d"]});
+                if (change_7d) > 15) {
+                    pumps_7d.push({"name": el["name"], "change": change_7d});
                 }                
-                if (parseFloat(el["percent_change_7d"]) < -15) {
-                    dumps_7d.push({"name": el["name"], "change": el["percent_change_7d"]});
+                if (change_7d) < -15) {
+                    dumps_7d.push({"name": el["name"], "change": change_7d});
                 }                
             });
 
