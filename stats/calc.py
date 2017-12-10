@@ -4,14 +4,20 @@ def update_obj_by_rules(obj, data, rules):
             for attr in attrs:
                 new_val = data.get(attr, None)
                 old_val = getattr(obj, "min_%s" % attr, None)
-                if old_val is None or new_val is not None and new_val < old_val:
-                    setattr(obj, "min_%s" % attr, int(float(new_val)))
+                if new_val is None:
+                    continue
+                if old_val is not None and new_val > old_val:
+                    continue
+                setattr(obj, "min_%s" % attr, int(float(new_val)))
         if rule == 'max':
             for attr in attrs:
                 new_val = data.get(attr, None)
                 old_val = getattr(obj, "max_%s" % attr, None)
-                if old_val is None or new_val is not None and new_val > old_val:
-                    setattr(obj, "max_%s" % attr, int(float(new_val)))
+                if new_val is None:
+                    continue
+                if old_val is not None and new_val < old_val:
+                    continue
+                setattr(obj, "max_%s" % attr, int(float(new_val)))
         if rule == 'sum':
             for attr in attrs:
                 new_val = data.get(attr, None)
@@ -35,7 +41,13 @@ def calc_extra_attrs(cls, date):
         return
 
     obj.supply = int(get_supply(obj.max_id))
-    obj.market_cap = int(float(obj.supply)) * int(float(obj.max_price_usd))
-    obj.sum_transaction_count_square = int(float(obj.sum_transaction_count)) ** 2
+    try:
+        obj.market_cap = int(float(obj.supply)) * int(float(obj.max_price_usd))
+    except:
+        pass
+    try:
+        obj.sum_transaction_count_square = int(float(obj.sum_transaction_count)) ** 2
+    except:
+        pass
     obj.put()
     

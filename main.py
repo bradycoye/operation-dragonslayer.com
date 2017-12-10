@@ -28,7 +28,7 @@ def charts_bitcoin():
 
 @app.route('/charts/bitcoin/data')
 def charts_bitcoin_data():
-    return jsonify(DayStats.get_data())
+    return jsonify(DayStats.get_data(range=request.values.get("range")))
 
 # -- general
 

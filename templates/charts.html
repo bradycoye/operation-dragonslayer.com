@@ -14,8 +14,22 @@
 Lalala...
 </p>
 
+<div style="float: right;">
+    <select class="select-range">
+        <option value="1w" selected>1w</option>
+        <option value="1m">1m</option>
+        <option value="1y">1y</option>
+        <option value="all">all</option>
+    </select>
+    <button class="btn-refresh">refresh</button>
+</div>
+<div class="chart-metrics" style="font-size: 12px;"></div>
+
+<br>
+
 <div class="chart-placeholder" style="height: 500px;">
 </div>
+<br><br><br><br>
 <div class="chart-footer">
 </div>
 
@@ -49,14 +63,23 @@ Lalala...
 	    }
 	
 	    function refresh() {
-	    
-            $.getJSON("/charts/bitcoin/data", function(result) {
+	        var range = $(".select-range").val();
+            $.getJSON("/charts/bitcoin/data?range=" + range, function(result) {
                 params = [];
                 $.each(result.labels, function(id, label) {
                     params.push({
                         "label": label,
                         "data": []
                     });
+                    var el = $(".metric-" + label);
+                    var checked = (
+                        label == "market_cap" || label == "sum_transaction_count_square" ? " checked" : ""
+                    );
+                    if (el.length == 0) {
+                        $(".chart-metrics").append(
+                            '<span style="white-space: nowrap"><input' + checked + ' type="checkbox" class="metric metric-' + label + '">' + label + '</span>&nbsp;&nbsp;'
+                        )
+                    }
                 });
                 $.each(result.data, function(id, series) {
                     $.each(series, function(id2, obj) {
@@ -67,11 +90,30 @@ Lalala...
                     normalize(params[id]["data"]);
                 })
 
+                // check what series are disabled
+                $.each(params, function (id, param) {
+                    if (!$('.metric-' + param.label).prop("checked")) {
+                        param.label = "";
+                        param.data = [];
+                    }
+                });
+
+                var days = 30;
+                if (range == "1w") {
+                    days = 1;
+                }
+                if (range == "1m") {
+                    days = 4;
+                }
+                if (range == "1y") {
+                    days = 48;
+                }
+
 		        $.plot(".chart-placeholder", params, {
                     xaxis: {
                         mode: "time",
                         timeformat: "%Y-%m-%d",
-                        tickSize: [365, "day"]
+                        tickSize: [days, "day"]
                     },
 			        series: {
 				        lines: { show: true },
@@ -85,9 +127,15 @@ Lalala...
 					        bottom: 2,
 					        left: 2
 				        }
-			        }
+			        },
+			        legend: {
+                        position: "nw"
+                    }
 		        });
-		        $(".chart-footer").prepend("Flot " + $.plot.version);	    
+
+                $(".chart-placeholder").animate({opacity: 1}, 1000);
+		        
+		        $(".chart-footer").html("Flot " + $.plot.version);	    
 
                             
             });
@@ -95,8 +143,37 @@ Lalala...
 	    }
 
         refresh();
+        
+        $(".btn-refresh").click(function() {
+            $(".chart-placeholder").animate({opacity: 0.1}, 1000);
+            refresh();
+        });
 	});
 
 </script>
+
+<style>
+div.xAxis div.tickLabel 
+{    
+    transform: rotate(-90deg);
+    -ms-transform:rotate(-90deg); /* IE 9 */
+    -moz-transform:rotate(-90deg); /* Firefox */
+    -webkit-transform:rotate(-90deg); /* Safari and Chrome */
+    -o-transform:rotate(-90deg); /* Opera */
+    /*rotation-point:50% 50%;*/ /* CSS3 */
+    /*rotation:270deg;*/ /* CSS3 */
+}
+
+.flot-x-axis .tickLabel {
+    top: 530px !important;
+    text-align: left !important;
+    max-width: 500px !important;
+}
+
+.legend {
+    font-size: 10px !important;
+}
+
+</style>
 
 {% endblock %}
