@@ -5,21 +5,21 @@ def update_obj_by_rules(obj, data, rules):
                 new_val = data.get(attr, None)
                 old_val = getattr(obj, "min_%s" % attr, None)
                 if old_val is None or new_val is not None and new_val < old_val:
-                    setattr(obj, "min_%s" % attr, int(new_val))
+                    setattr(obj, "min_%s" % attr, round(float(new_val)))
         if rule == 'max':
             for attr in attrs:
                 new_val = data.get(attr, None)
                 old_val = getattr(obj, "max_%s" % attr, None)
                 if old_val is None or new_val is not None and new_val > old_val:
-                    setattr(obj, "max_%s" % attr, int(new_val))
+                    setattr(obj, "max_%s" % attr, round(float(new_val)))
         if rule == 'sum':
             for attr in attrs:
                 new_val = data.get(attr, None)
                 old_val = getattr(obj, "sum_%s" % attr, None)
                 if old_val is None:
-                    setattr(obj, "sum_%s" % attr, int(new_val))
+                    setattr(obj, "sum_%s" % attr, round(float(new_val)))
                 elif new_val is not None:
-                    setattr(obj, "sum_%s" % attr, int(old_val + int(new_val)))
+                    setattr(obj, "sum_%s" % attr, round(float(old_val + round(float(new_val)) )))
                     
 
 def get_supply(block):
