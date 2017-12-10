@@ -36,6 +36,7 @@ class BlockchairBitcoin(object):
             obj = cls(id="bitcoin|%s" % date)
         
         count = 0
+        data["data"].reverse()
         for block in data["data"]:
             if getattr(obj, "max_id", None):
                 if block["id"] <= obj.max_id:
