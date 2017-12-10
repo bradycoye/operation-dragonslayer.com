@@ -37,8 +37,8 @@ class BlockchairBitcoin(object):
         
         count = 0
         for block in data["data"]:
-            if getattr(obj, "last_block", None):
-                if block["id"] <= obj.last_block:
+            if getattr(obj, "max_id", None):
+                if block["id"] <= obj.max_id:
                     continue
             
             self.update_obj(obj, block)
