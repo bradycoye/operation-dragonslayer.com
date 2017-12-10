@@ -22,50 +22,79 @@ Lalala...
 <script>
 
 	$(function () {
-		var d1 = [];
-		for (var i = 0; i < Math.PI * 2; i += 0.25) {
-			d1.push([i, Math.sin(i)]);
-		}
-		var d2 = [];
-		for (var i = 0; i < Math.PI * 2; i += 0.25) {
-			d2.push([i, Math.cos(i)]);
-		}
-		var d3 = [];
-		for (var i = 0; i < Math.PI * 2; i += 0.1) {
-			d3.push([i, Math.tan(i)]);
-		}
-		$.plot(".chart-placeholder", [
-			{ label: "sin(x)", data: d1 },
-			{ label: "cos(x)", data: d2 },
-			{ label: "tan(x)", data: d3 }
-		], {
-			series: {
-				lines: { show: true },
-				points: { show: true }
-			},
-			xaxis: {
-				ticks: [
-					0, [ Math.PI/2, "\u03c0/2" ], [ Math.PI, "\u03c0" ],
-					[ Math.PI * 3/2, "3\u03c0/2" ], [ Math.PI * 2, "2\u03c0" ]
-				]
-			},
-			yaxis: {
-				ticks: 10,
-				min: -2,
-				max: 2,
-				tickDecimals: 3
-			},
-			grid: {
-				backgroundColor: { colors: [ "#fff", "#eee" ] },
-				borderWidth: {
-					top: 1,
-					right: 1,
-					bottom: 2,
-					left: 2
-				}
-			}
-		});
-		$(".chart-footer").prepend("Flot " + $.plot.version);
+	    function normalize(series) {
+            min_x = Number.MAX_SAFE_INTEGER;
+            max_x = -Number.MAX_SAFE_INTEGER;
+            
+            $.each(series, function(id, obj) {
+                if (obj[1] < min_x) {
+                    min_x = obj[1];
+                }
+                if (obj[1] > max_x) {
+                    max_x = obj[1];
+                }
+            })
+
+            $.each(series, function(id, obj) {
+                x = obj[1];
+                //x = x - min_x;
+                if (max_x != 0) {
+                    x = parseInt(1000000 * x / (max_x))
+                } else {
+                    x = 500000;
+                }
+                series[id][1] = x;
+            })
+            
+	    }
+	
+	    function refresh() {
+	    
+            $.getJSON("/charts/bitcoin/data", function(result) {
+                params = [];
+                $.each(result.labels, function(id, label) {
+                    params.push({
+                        "label": label,
+                        "data": []
+                    });
+                });
+                $.each(result.data, function(id, series) {
+                    $.each(series, function(id2, obj) {
+                        params[id]["data"].push(
+                            [Date.parse(obj[0]), obj[1]]
+                        );
+                    })
+                    normalize(params[id]["data"]);
+                })
+
+		        $.plot(".chart-placeholder", params, {
+                    xaxis: {
+                        mode: "time",
+                        timeformat: "%Y-%m-%d",
+                        tickSize: [365, "day"]
+                    },
+			        series: {
+				        lines: { show: true },
+				        points: { show: true }
+			        },
+			        grid: {
+				        backgroundColor: { colors: [ "#fff", "#eee" ] },
+				        borderWidth: {
+					        top: 1,
+					        right: 1,
+					        bottom: 2,
+					        left: 2
+				        }
+			        }
+		        });
+		        $(".chart-footer").prepend("Flot " + $.plot.version);	    
+
+                            
+            });
+
+	    }
+
+        refresh();
 	});
 
 </script>

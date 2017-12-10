@@ -6,9 +6,11 @@ logging.basicConfig(level=logging.DEBUG)
 from flask import Flask
 from flask import render_template
 from flask import request
-from flask import redirect, url_for
+from flask import redirect, url_for, jsonify
 
 from google.appengine.api.mail import send_mail
+
+from charts import DayStats
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -17,13 +19,16 @@ app.config['DEBUG'] = True
 
 @app.route('/stats/bitcoin/update')
 def stats_bitcoin_update():
-    from charts import DayStats
-    ret = DayStats.update()
+    ret = DayStats.update(next=request.values.get("next", None))
     return str(ret)
 
 @app.route('/charts/bitcoin')
 def charts_bitcoin():
     return render_template('charts.html')
+
+@app.route('/charts/bitcoin/data')
+def charts_bitcoin_data():
+    return jsonify(DayStats.get_data())
 
 # -- general
 

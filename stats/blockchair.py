@@ -26,8 +26,12 @@ RULES = {
 class BlockchairBitcoin(object):
     URL = "https://api.blockchair.com/bitcoin/blocks"
     
-    def update(self, cls):
-        data = json.loads(urlopen(self.URL).read())
+    def update(self, cls, next=None):
+        url = self.URL
+        if next:
+            url += "?s=id(asc)&next=%s&next_sort=%s" % (next, next)
+    
+        data = json.loads(urlopen(url).read())
 
         date = data["data"][0]["date"]
 
@@ -36,7 +40,8 @@ class BlockchairBitcoin(object):
             obj = cls(id="bitcoin|%s" % date)
         
         count = 0
-        data["data"].reverse()
+        if not next:
+            data["data"].reverse()
         for block in data["data"]:
             if getattr(obj, "max_id", None):
                 if block["id"] <= obj.max_id:
@@ -54,5 +59,6 @@ class BlockchairBitcoin(object):
         miner = slugify(block.get("guessed_miner", "none"))
         setattr(obj, "miner_%s" % miner, getattr(obj, "miner_%s" % miner, 0) + 1)
         return update_obj_by_rules(obj, block, RULES)
-
+    
+    
     
