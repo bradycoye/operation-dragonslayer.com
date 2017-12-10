@@ -1,4 +1,4 @@
-
+import logging
 import sys
 import json
 
@@ -15,9 +15,12 @@ class DayStats(ndb.Expando):
             from stats.coinmarketcap import CoinmarketcapBitcoin
             CoinmarketcapBitcoin().update(cls, ret["date"])
         except:
-            pass
+            logging.exception("coinmarketcap")
             
-        from stats.calc import calc_extra_attrs
-        calc_extra_attrs(cls, ret["date"])
+        try:
+            from stats.calc import calc_extra_attrs
+            calc_extra_attrs(cls, ret["date"])
+        except:
+            logging.exception("extra_attrs")
 
         return ret

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 from flask import Flask
 from flask import render_template
 from flask import request
@@ -17,6 +20,10 @@ def stats_bitcoin_update():
     from charts import DayStats
     ret = DayStats.update()
     return str(ret)
+
+@app.route('/charts/bitcoin')
+def charts_bitcoin():
+    return render_template('charts.html')
 
 # -- general
 
