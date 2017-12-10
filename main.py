@@ -10,6 +10,16 @@ from google.appengine.api.mail import send_mail
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
+# -- stats
+
+@app.route('/stats/bitcoin/update')
+def stats_bitcoin_update():
+    from charts import DayStats
+    ret = DayStats.update()
+    return str(ret)
+
+# -- general
+
 @app.route('/')
 def home():
     return render_template('home.html')
