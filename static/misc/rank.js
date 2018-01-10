@@ -5,6 +5,17 @@
 
     RANKS = [];
 
+    WITNESSES = {
+        "clemens": true, 
+        "codemojo": true,
+        "ero": true, 
+        "creative.mind": true, 
+        "bend0ver": true,
+        "kakashi": true, 
+        "mooncryption": true, 
+        "Satchmo": true, 
+    }
+
     function calc(nodes, cb) {
         //nodes = [[1,2],[],[0,1,4],[4,5],[3,5],[3]]
         linkProb = 0.85 //high numbers are more stable
@@ -57,19 +68,14 @@
             $.each(NAME_TO_ID, function(name, id) {
                 NAME_TO_ID[name] = count;
                 ID_TO_VOTES[count] = 0;
+                if (WITNESSES[name]) {
+                    ID_TO_VOTES[count] += Object.keys(NAME_TO_ID).length;
+                }
                 ID_TO_NAME[count] = name;
-                NODES.push([
-                    NAME_TO_ID["clemens"], 
-                    NAME_TO_ID["codemojo"],
-                    NAME_TO_ID["ero"], 
-                    NAME_TO_ID["creative.mind"], 
-                    NAME_TO_ID["bend0ver"],
-                    NAME_TO_ID["kakashi"], 
-                    NAME_TO_ID["mooncryption"], 
-                    NAME_TO_ID["txcsh"], 
-                ]);
-                //NODES.push([NAME_TO_ID["Ryan X. Charles"], NAME_TO_ID["clemens"]]);
-                //NODES.push([]);
+                NODES.push([]);
+                $.each(WITNESSES, function(witness_name, foo) {
+                    NODES[NODES.length - 1].push(NAME_TO_ID[witness_name])
+                })                
                 count++;
             })
             
