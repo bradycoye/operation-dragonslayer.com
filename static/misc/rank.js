@@ -58,7 +58,8 @@
                 NAME_TO_ID[name] = count;
                 ID_TO_VOTES[count] = 0;
                 ID_TO_NAME[count] = name;
-                NODES.push([NAME_TO_ID["Ryan X. Charles"], NAME_TO_ID["clemens"]]);
+                //NODES.push([NAME_TO_ID["Ryan X. Charles"], NAME_TO_ID["clemens"]]);
+                NODES.push([]);
                 count++;
             })
             
