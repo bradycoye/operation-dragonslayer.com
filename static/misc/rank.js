@@ -64,6 +64,7 @@
                     NAME_TO_ID["ero"], 
                     NAME_TO_ID["creative.mind"], 
                     NAME_TO_ID["bend0ver"],
+                    NAME_TO_ID["kakashi"], 
                     NAME_TO_ID["mooncryption"], 
                     NAME_TO_ID["txcsh"], 
                 ]);
