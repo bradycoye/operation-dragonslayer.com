@@ -8,7 +8,6 @@
     WITNESSES = {
         "clemens": true, 
         "codemojo": true,
-        "ero": true, 
         "creative.mind": true, 
         "bend0ver": true,
         "kakashi": true, 
