@@ -1,0 +1,65 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Yours.org Rank</title>
+
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.js"
+    integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+    crossorigin="anonymous">
+  </script>
+
+  <script src="/static/misc/pagerank.js"></script>
+  <script src="/static/misc/rank.js"></script>
+  
+</head>
+
+<body>
+
+<div class="rank-container">
+    <table>
+        <tr>
+            <th>
+               score
+            </th>
+            <th>
+               score (relative)
+            </th>
+            <th>
+               score (absolute)
+            </th>
+            <th>
+                name
+            </th>
+        </tr>
+    </table>
+</div>
+
+<script type="text/javascript">
+
+
+    $(function() {
+        run(render);
+    })
+
+</script>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-582655-17"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-582655-17');
+</script>
+    
+</body>
+</html>
+
+
+
+

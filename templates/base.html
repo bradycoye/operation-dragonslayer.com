@@ -6,8 +6,9 @@
 <table class="menu" style="width: 100%;">
   <tr>
     <td style="text-align: right;">
-      <a{% block home_menu %}{%endblock%} href="{{ url_for('home') }}">Dragonslayer</a>
-      <a{% block faq_menu %}{%endblock%} href="{{ url_for('faq') }}">FAQ</a>
+      <a{% block home_menu %}{% endblock %} href="{{ url_for('home') }}">Dragonslayer</a>
+      <a{% block faq_menu %}{% endblock %} href="{{ url_for('faq') }}">FAQ</a>
+      <a{% block charts_menu %}{% endblock %} href="{{ url_for('charts_bitcoin') }}">Charts</a>
     </td>
   </tr>
 </table>
@@ -20,6 +21,8 @@
     <div>
       <h2>Operation-dragonslayer.com</h2>
       Operated by a group of crypto enthusiasts.<br>
+      <b>BCH</b>: 1E8j3QDrvZcuG3PJisZkU3RhepGexWVVmX<br>
+      <span style="font-size: 14px;">Message "codemojo" signature:<br> <b>H4osFiwRIQYyJXAtjcrdqv2Ls455Uk1uEFf31QRWhuw16ypeZibWZMsNP2C1WC5Hskb5j131RrE6g431GnYaiDQ=</b></span>
     </div>
 </div>
 

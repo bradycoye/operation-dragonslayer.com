@@ -1,32 +1,44 @@
+import logging
+
 def update_obj_by_rules(obj, data, rules):
     for rule, attrs in rules.items():
         if rule == 'min':
             for attr in attrs:
-                new_val = data.get(attr, None)
-                old_val = getattr(obj, "min_%s" % attr, None)
-                if new_val is None:
-                    continue
-                if old_val is not None and new_val > old_val:
-                    continue
-                setattr(obj, "min_%s" % attr, int(float(new_val)))
+                try:
+                    new_val = data.get(attr, None)
+                    old_val = getattr(obj, "min_%s" % attr, None)
+                    if new_val is None:
+                        continue
+                    if old_val is not None and new_val > old_val:
+                        continue
+                    setattr(obj, "min_%s" % attr, int(float(new_val)))
+                except:
+                    logging.exception("min_%s" % attr)
         if rule == 'max':
             for attr in attrs:
-                new_val = data.get(attr, None)
-                old_val = getattr(obj, "max_%s" % attr, None)
-                if new_val is None:
-                    continue
-                if old_val is not None and new_val < old_val:
-                    continue
-                setattr(obj, "max_%s" % attr, int(float(new_val)))
+                try:
+                    new_val = data.get(attr, None)
+                    old_val = getattr(obj, "max_%s" % attr, None)
+                    if new_val is None:
+                        continue
+                    if old_val is not None and new_val < old_val:
+                        continue
+                    setattr(obj, "max_%s" % attr, int(float(new_val)))
+                except:
+                    logging.exception("max_%s" % attr)
+                
         if rule == 'sum':
             for attr in attrs:
-                new_val = data.get(attr, None)
-                old_val = getattr(obj, "sum_%s" % attr, None)
-                if old_val is None:
-                    setattr(obj, "sum_%s" % attr, int(float(new_val)))
-                elif new_val is not None:
-                    setattr(obj, "sum_%s" % attr, int(float(old_val + int(float(new_val)) )))
-                    
+                try:
+                    new_val = data.get(attr, None)
+                    old_val = getattr(obj, "sum_%s" % attr, None)
+                    if old_val is None:
+                        setattr(obj, "sum_%s" % attr, int(float(new_val)))
+                    elif new_val is not None:
+                        setattr(obj, "sum_%s" % attr, int(float(old_val + int(float(new_val)) )))
+                except:
+                    logging.exception("sum_%s" % attr)
+                                    
 
 def get_supply(block):
     supply = 0

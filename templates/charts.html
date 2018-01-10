@@ -6,20 +6,38 @@
 
 {% block content %}
 
+<script>
+
+  var CHARTS_DATA = {{ json.dumps(CHARTS_DATA)|safe }}
+
+  $(function() {
+    $("." + CHARTS_DATA.coin + "-nav-link").addClass("active");
+    $(".charts-title").html(CHARTS_DATA.coin + " charts");
+  })
+
+</script>
+
 <div>
 
-<h2>Bitcoin Charts</h2>
+<a class="bitcoin-nav-link" href="{{ url_for('charts_bitcoin') }}">bitcoin</a>
+|
+<a class="bitcoin-cash-nav-link" href="{{ url_for('charts_bch') }}">bitcoin-cash</a>    
 
-<p>
-Lalala...
-</p>
+</div>
+
+<div>
+
+<h2 class="charts-title">Bitcoin Charts</h2>
 
 <div style="float: right;">
+    <select class="select-norm">
+        <option value="normalised" selected>normalised</option>
+        <option value="actual">actual</option>
+    </select>
     <select class="select-range">
-        <option value="1w" selected>1w</option>
-        <option value="1m">1m</option>
+        <option value="1w">1w</option>
+        <option value="1m" selected>1m</option>
         <option value="1y">1y</option>
-        <option value="all">all</option>
     </select>
     <button class="btn-refresh">refresh</button>
 </div>
@@ -33,71 +51,154 @@ Lalala...
 <div class="chart-footer">
 </div>
 
+<br>
+
+<p style="font-size: 12px;">
+Today's data points for attributes <b>sum_*</b> and <b>block_count</b> are predicted based on current values.
+</p>
+
+
 <script>
 
 	$(function () {
-	    function normalize(series) {
-            min_x = Number.MAX_SAFE_INTEGER;
-            max_x = -Number.MAX_SAFE_INTEGER;
-            
-            $.each(series, function(id, obj) {
-                if (obj[1] < min_x) {
-                    min_x = obj[1];
-                }
-                if (obj[1] > max_x) {
-                    max_x = obj[1];
-                }
-            })
+	    function normalize(params) {
+	        $.each(params, function(id, param) {
+                var min_x = Number.MAX_SAFE_INTEGER;
+                var max_x = -Number.MAX_SAFE_INTEGER;
 
-            $.each(series, function(id, obj) {
-                x = obj[1];
-                //x = x - min_x;
-                if (max_x != 0) {
-                    x = parseInt(1000000 * x / (max_x))
-                } else {
-                    x = 500000;
-                }
-                series[id][1] = x;
-            })
+                $.each(param.data, function(id, obj) {
+                    if (obj[1] < min_x) {
+                        min_x = obj[1];
+                    }
+                    if (obj[1] > max_x) {
+                        max_x = obj[1];
+                    }
+                })
+
+                $.each(param.data, function(id, obj) {
+                    x = obj[1];
+                    //x = x - min_x;
+                    if (max_x != 0) {
+                        x = parseInt(1000000 * x / (max_x))
+                    } else {
+                        x = 500000;
+                    }
+                    param.data[id][1] = x;
+                })
+	        });
+	    }
+	
+	    function realtime_predict(params, realtime) {
+            if (!realtime.enabled) {
+                console.log("realtime disabled");
+                return
+            }
             
+            var last_time = Date.parse(realtime.max_time) / 1000;
+            var date = Date.parse(realtime.max_time.split(" ")[0]) / 1000;
+            var dt = last_time - date;
+            console.log("realtime " + realtime.max_time + " " + dt/3600);
+	        $.each(params, function(id, param) {
+	            if (param.data.length == 0) {
+	                return;
+	            }
+	            if (param.label.startsWith("sum_") || param.label == "block_count") {
+	                var last_pair = param.data[param.data.length -1];
+                    var q = 24*60*60 / dt;
+	                if (param.label.endsWith("_square")) {
+	                    q = q * q;
+	                }
+	                console.log(param.label + " " + q);
+	                last_pair[1] *= q;
+	            }
+	        })
+	    }
+	
+	    function render_metric(label) {
+            var selected = (
+                label == "market_cap" || label == "sum_transaction_count_square" ? " selected" : ""
+            );
+            var custom_class = '';
+            if (label == "market_cap") {
+                custom_class = " important";
+            }
+            if (label == "sum_transaction_count_square") {
+                custom_class = " important2";
+            }
+            if (label.startsWith("miner_")) {
+                custom_class = " miner";
+            }
+            $(".chart-metrics").append(
+                '<a href="#" class="metric' + custom_class + ' metric-' + label + selected + '">' + label + '</a> '
+            )
 	    }
 	
 	    function refresh() {
 	        var range = $(".select-range").val();
-            $.getJSON("/charts/bitcoin/data?range=" + range, function(result) {
+            $.getJSON("/charts/" + CHARTS_DATA.coin + "/data?range=" + range, function(result) {
                 params = [];
+                
                 $.each(result.labels, function(id, label) {
-                    params.push({
+                    var d = {
                         "label": label,
-                        "data": []
-                    });
+                        "data": [],
+                        "dashes": {show: false},
+                        "points": {show: false},
+                        "lines": {show: true, lineWidth: 2}
+                    }
+                    if (label.startsWith("sum_")) {
+                        d.dashes.show = true;
+                    }
+                    if (["sum_transaction_count_square"].indexOf(label) != -1) {
+                        d.points.show = true;
+                    }
+                    if (["market_cap"].indexOf(label) != -1) {
+                        d.lines.lineWidth = 6;
+                    }
+                    d.lines.show = !d.dashes.show;
+                    if (label == "market_cap") {
+                        d.color = "#ff0000";
+                    }
+                    if (label == "sum_transaction_count_square") {
+                        d.color = "#0000ff";
+                    }
+                    params.push(d);
                     var el = $(".metric-" + label);
-                    var checked = (
-                        label == "market_cap" || label == "sum_transaction_count_square" ? " checked" : ""
-                    );
                     if (el.length == 0) {
-                        $(".chart-metrics").append(
-                            '<span style="white-space: nowrap"><input' + checked + ' type="checkbox" class="metric metric-' + label + '">' + label + '</span>&nbsp;&nbsp;'
-                        )
+                        render_metric(label);
                     }
                 });
+                
                 $.each(result.data, function(id, series) {
+                    // parse
                     $.each(series, function(id2, obj) {
                         params[id]["data"].push(
                             [Date.parse(obj[0]), obj[1]]
                         );
                     })
-                    normalize(params[id]["data"]);
                 })
+
+                // realtime predict
+                try {
+                    realtime_predict(params, result.realtime)
+                } catch (err) {
+                    console.log(err);
+
+                }
+
+                // normalize
+                if ($(".select-norm").val() == "normalised") {
+                    normalize(params);
+                }
 
                 // check what series are disabled
                 $.each(params, function (id, param) {
-                    if (!$('.metric-' + param.label).prop("checked")) {
+                    if (!$('.metric-' + param.label).hasClass("selected")) {
                         param.label = "";
                         param.data = [];
                     }
                 });
-
+                                
                 var days = 30;
                 if (range == "1w") {
                     days = 1;
@@ -116,8 +217,8 @@ Lalala...
                         tickSize: [days, "day"]
                     },
 			        series: {
-				        lines: { show: true },
-				        points: { show: true }
+				        //dashes: { show: true },
+				        //points: { show: true }
 			        },
 			        grid: {
 				        backgroundColor: { colors: [ "#fff", "#eee" ] },
@@ -137,12 +238,16 @@ Lalala...
 		        
 		        $(".chart-footer").html("Flot " + $.plot.version);	    
 
-                            
             });
 
 	    }
 
         refresh();
+        
+        $(".chart-metrics").on("click", "a.metric", function() {
+            $(this).toggleClass("selected");
+            return false;
+        })
         
         $(".btn-refresh").click(function() {
             $(".chart-placeholder").animate({opacity: 0.1}, 1000);
@@ -171,7 +276,27 @@ div.xAxis div.tickLabel
 }
 
 .legend {
-    font-size: 10px !important;
+    font-size: 16px !important;
+}
+
+.metric {
+    color: black;
+}
+
+.metric.selected {
+    color: #ff0000;
+}
+
+.metric.important {
+    border: 1px solid red;
+}
+
+.metric.important2 {
+    border: 1px dashed blue;
+}
+
+.metric.miner {
+    background-color: #ccc;
 }
 
 </style>

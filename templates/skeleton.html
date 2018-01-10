@@ -8,12 +8,13 @@
   <title>{% block title %}{% endblock %} | Operation Dragonslayer</title>
 
   <link rel="stylesheet" href="/static/new/style.css">
-  <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">  
-  <link href="https://fonts.googleapis.com/css?family=Bungee" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Saira+Semi+Condensed" rel="stylesheet">
 
   <link rel="stylesheet" href="/static/new/owl/owl.carousel.css">
   <link rel="stylesheet" href="/static/new/owl/owl.theme.default.css">
 
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+  
   <script
     src="https://code.jquery.com/jquery-3.2.1.js"
     integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
@@ -21,7 +22,11 @@
   </script>
   <script src="/static/jquery.flot.js"></script>
   <script src="/static/jquery.flot.time.js"></script>
+  <script src="/static/jquery.flot.dashes.js"></script>
   <script src="/static/new/owl/owl.carousel.js"></script>  
+
+  <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+  
   
 </head>
 
@@ -29,21 +34,62 @@
 
 <a href="https://github.com/jurev/operation-dragonslayer.com"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
 
+<div style="position: absolute; top: 0; left: 0; font-size: 12px; background-color: rgba(255, 255, 255, 0.8)">
+        <table>
+            <tr>
+                <th colspan="2">
+                    {{ g.user_model.email }}
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    expires
+                </td>
+                <td>
+                    {{ g.user_model.expires }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    lag
+                </td>
+                <td>
+                    {% if g.user_model.lag != g.user_model.get_actual_lag() %}
+                        <s>{{ g.user_model.lag }} days</s><br>
+                    {% endif %}
+                    {{ g.user_model.get_actual_lag() }} days
+                    
+                </td>
+            </tr>
+        </table>
+        <br>
+    {% if g.user %}
+        <a href="{{ g.logout_url }}">Logout</a>
+    {% else %}
+        <a href="{{ g.login_url }}">Login</a> for realtime stats.
+    {% endif %}
+</div>
+
   <div style="text-align: center">
 
-  <div class="container" style="background-color: black; color: white">
-  <b>
-     WARNING: A friendly advice to crypto users.
-     Word on the street is there's going to be a powerful attack on the Bitcoin network this year.
-     Code name for the attack is "Operation Dragonslayer".
-     Holding large quantities of fiat money or coins on exchanges is not recommended.
-     Untill this is resolved we advise storing your wealth offline.
-  </b>
-  </div>
-
-    <div class="container">
-        {%block body%}{% endblock %}
-    </div>
+      <!--
+      <div class="container" style="background-color: black; color: white">
+      <b>
+         WARNING: A friendly advice to crypto users.
+         Word on the street is there's going to be a powerful attack on the Bitcoin network this year.
+         Code name for the attack is "Operation Dragonslayer".
+         Holding large quantities of fiat money or coins on exchanges is not recommended.
+         Untill this is resolved we advise storing your wealth offline.
+      </b>
+      </div>
+      
+      <br>
+      -->
+      
+      <div class="container">
+          {%block body%}{% endblock %}
+      </div>
+  
   </div>
 
 <!-- Global site tag (gtag.js) - Google Analytics -->

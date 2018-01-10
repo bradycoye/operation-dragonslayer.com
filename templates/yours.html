@@ -1,0 +1,91 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Yours.org Graph</title>
+
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.js"
+    integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+    crossorigin="anonymous">
+  </script>
+  <script src="/static/jquery.flot.js"></script>
+  <script src="/static/jquery.flot.time.js"></script>
+  <script src="/static/jquery.flot.dashes.js"></script>
+  
+</head>
+
+<body>
+
+  <link rel="stylesheet" href="/static/misc/styles/vendor.css"/>
+  <link rel="stylesheet" href="/static/misc/alchemy.css"/>
+
+
+  <style>
+    #alchemy text {
+        display: block !important;
+    }    
+  </style>
+
+  <div class="alchemy" id="alchemy" style="height: 600px;"></div>
+
+  <script type="text/javascript" src="/static/misc/scripts/vendor.js"></script>
+  <script type="text/javascript" src="/static/misc/alchemy.js"></script>
+  <script src="/static/misc/pagerank.js"></script>
+  <script src="/static/misc/rank.js"></script>
+
+  <script type="text/javascript">
+
+        $(function () {
+            run(function() {            
+                var config = {
+                    dataSource: '/misc/yours/data.json',
+                    //graphWidth: function() {return 800},
+                    //graphHeight: function() {return 600},
+                    zoomControls: true,
+                    initialScale: 1,
+                    directedEdges: true,
+                    linkDistancefn: function() { return 1000; }
+                    
+                };
+
+                alchemy = new Alchemy(config);
+
+                setTimeout(function() {
+                    $.each(RANKS, function(id, rank) {
+                        $("g.node").each(function() {
+                            if ($(this).find("text").text() == 'Ryan X. Charles') {
+                                return;
+                            }
+                            if ($(this).find("text").text() == 'clemens') {
+                                return;
+                            }
+                            if ($(this).find("text").text() == ID_TO_NAME[rank[3]]) {
+                                $(this).find("text").text(ID_TO_NAME[rank[3]] + " (" + rank[0] + ")");
+                            };
+                        })
+                    })                        
+                }, 3000);
+            })
+        })
+  
+  </script>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-582655-17"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-582655-17');
+</script>
+    
+</body>
+</html>
+
+
+
+

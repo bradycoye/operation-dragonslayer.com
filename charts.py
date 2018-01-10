@@ -6,9 +6,16 @@ from datetime import datetime, timedelta
 from google.appengine.ext import ndb
 
 from flask import request
+from flask import g
 
+from stats import realtime
 
+EXCLUDED_PROPERTIES = ["date"]
+"""
 PROPERTIES = [
+    "max_id",
+    "min_id",
+    "block_count",
     "max_size",
     "max_difficulty",
     "max_fee_per_kb_usd",
@@ -31,10 +38,19 @@ PROPERTIES = [
     'market_cap',
     'sum_transaction_count_square',
 ]
+"""
+
+from stats.blockchair import BlockchairBitcoin, BlockchairBitcoinCash
+from stats.coinmarketcap import CoinmarketcapBitcoin, CoinmarketcapBitcoinCash
+
 
 class DayStats(ndb.Expando):
-    date = ndb.StringProperty()
+    COIN = "bitcoin"
+    BLOCKCHAIR = BlockchairBitcoin
+    COINMARKETCAP = CoinmarketcapBitcoin
 
+    date = ndb.StringProperty()
+    
     @classmethod
     def update(cls, coin="bitcoin", next=None):
         if request.values.get("calc_extra"):
@@ -48,16 +64,14 @@ class DayStats(ndb.Expando):
                     logging.error("extra: failed %s" % obj.date)
             return "extra"
     
-        from stats.blockchair import BlockchairBitcoin        
-        ret = BlockchairBitcoin().update(cls, next=next)
+        ret = cls.BLOCKCHAIR().update(cls, next=next)
         
         if not next:
             try:    
-                from stats.coinmarketcap import CoinmarketcapBitcoin
                 if request.values.get("path"):
-                    CoinmarketcapBitcoin().update(cls, path=request.values.get("path"))
+                    cls.COINMARKETCAP().update(cls, path=request.values.get("path"))
                 else:
-                    CoinmarketcapBitcoin().update(cls, date=ret["date"])
+                    cls.COINMARKETCAP().update(cls, date=ret["date"])
                 
             except:
                 logging.exception("coinmarketcap")
@@ -72,22 +86,42 @@ class DayStats(ndb.Expando):
         
     @classmethod
     def get_data(cls, range=None):
-        date = "2013-01-01"
+        date_start = datetime.strptime("2013-01-01", "%Y-%m-%d")
+        date_end = datetime.now() - timedelta(days=g.user_model.get_actual_lag())
         if range == "1w":
-            date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+            date_start = date_end - timedelta(days=7)
         if range == "1m":
-            date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+            date_start = date_end - timedelta(days=30)
         if range == "1y":
-            date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
+            date_start = date_end - timedelta(days=365)
         
-        objs = cls.query(cls.date > date).order(cls.date).fetch(10000)
+        date_start = date_start.strftime("%Y-%m-%d")
+        date_end = date_end.strftime("%Y-%m-%d")
+        
+        objs = cls.query(cls.date >= date_start, cls.date <= date_end).order(cls.date).fetch(10000)
+        PROPERTIES = set()
+        for obj in objs:
+            PROPERTIES = PROPERTIES.union(obj._properties.keys())
+        PROPERTIES = PROPERTIES - set(EXCLUDED_PROPERTIES)
+        PROPERTIES = sorted(list(PROPERTIES))
         result = {
             "labels": PROPERTIES,
             "data": [[] for x in PROPERTIES],
+            "realtime": realtime.get_data(cls),
         }
+        if not objs:
+            return result
+        
+        
         for obj in objs:
             data = result["data"]
             for id, prop in enumerate(PROPERTIES):
                 data[id].append([obj.date, getattr(obj, prop, 0)])
         
         return result
+        
+class DayStatsBCH(DayStats):
+    COIN = "bitcoin-cash"
+    BLOCKCHAIR = BlockchairBitcoinCash
+    COINMARKETCAP = CoinmarketcapBitcoinCash
+

@@ -2,3 +2,14 @@ cron:
 - description: update bitcoin stats
   url: /stats/bitcoin/update
   schedule: every 10 minutes
+
+- description: update bitcoin-cash stats
+  url: /stats/bitcoin-cash/update
+  schedule: every 10 minutes
+  
+
+- description: update yours.org data
+  url: /misc/yours/update
+  schedule: every 10 minutes
+  
+
