@@ -46,10 +46,10 @@
     }
 
     function render() {
-        $(".rank-container table").html("");
+        $(".rank-container table tbody").html("");
         $.each(RANKS, function(id, rank) {
         
-            $(".rank-container table").append("<tr><td>" + rank[0] + "</td><td>" + rank[1] + "</td><td>" + rank[2] + "</td><td>" + ID_TO_NAME[rank[3]] + "</td></tr>");
+            $(".rank-container table tbody").append("<tr><td>" + rank[0] + "</td><td>" + rank[1] + "</td><td>" + rank[2] + "</td><td>" + ID_TO_NAME[rank[3]] + "</td></tr>");
             
         })        
     }
