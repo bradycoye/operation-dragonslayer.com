@@ -23,6 +23,7 @@ class YoursPost(ndb.Expando):
     def update(cls):
           
         data = json.loads(urlopen("https://www.yours.org/api/contents/home/all/hot/0").read())
+        count = 0
         for row in data:
             obj = cls.get_by_id(row["id"])
             if not obj:
@@ -38,11 +39,14 @@ class YoursPost(ndb.Expando):
             
             print "https://www.yours.org/api/contents/id/%s" % obj.id
             extra = json.loads(urlopen("https://www.yours.org/api/content/id/%s" % obj.id).read())
-            obj.worthPayingFor = extra["content"]["worthPayingFor"]                        
-            obj.notWorthPayingFor = extra["content"]["notWorthPayingFor"]
-            obj.put()
+            earned = extra["content"]["totalPurchased"] + extra["content"]["totalTipped"] + extra["content"]["totalCommented"] + extra["content"]["amountVoted"]
+            if earned > 500000:
+                obj.worthPayingFor = extra["content"]["worthPayingFor"]                        
+                obj.notWorthPayingFor = extra["content"]["notWorthPayingFor"]
+                obj.put()
+                count += 1
             
-        return str(len(data))
+        return str(count)
 
     @classmethod
     def get_data(cls):
@@ -55,7 +59,7 @@ class YoursPost(ndb.Expando):
         nodes = data["nodes"]
         edges = data["edges"]
     
-        posts = cls.query().order(-YoursPost.createdAt).fetch(10000)
+        posts = cls.query().order(-YoursPost.createdAt).fetch(100)
         for post in posts:
             nodes.append({
                 "caption": post.userName,
