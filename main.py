@@ -14,6 +14,8 @@ from flask import request
 from flask import redirect, url_for, jsonify
 from flask import g
 
+import requests
+
 from google.appengine.ext import ndb
 from google.appengine.api.mail import send_mail
 from google.appengine.api import users
@@ -21,7 +23,7 @@ from google.appengine.api import users
 from charts import DayStats, DayStatsBCH
 from stats.blockchair import BlockchairBitcoin, BlockchairBitcoinCash
 
-from local.config import predictions_url
+from local.config import predictions_url, proxy_auth
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -75,6 +77,17 @@ def my_ctx():
     return {"g": g, "json": json}
 
 
+def fetch_url(url, data=None):
+    proxies = {
+        'http': 'http://%s@us-wa.proxymesh.com:31280' % proxy_auth,
+        'https': 'http://%s@us-wa.proxymesh.com:31280' % proxy_auth
+    }
+    if data is None:
+        response = requests.get(url, proxies=proxies)
+    else:
+        response = requests.post(url, data=data, proxies=proxies)
+    return response.text
+    
 # -- predictions
 @app.route('/' + predictions_url)
 def predictions():
@@ -82,7 +95,7 @@ def predictions():
 
 @app.route('/predictions/compare.reddits')
 def predictions_compare_reddits():
-    data = json.loads(urlopen("http://redditmetrics.com/ajax/compare.reddits", data="reddit0=%s" % request.values.get("reddit0")).read())
+    data = json.loads(fetch_url("http://redditmetrics.com/ajax/compare.reddits", data={"reddit0": request.values.get("reddit0")}))
     return jsonify(data)
 
 @app.route('/predictions/marketcap/currencies/<coin>/<ts1>/<ts2>/')
