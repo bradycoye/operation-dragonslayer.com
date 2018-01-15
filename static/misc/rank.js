@@ -6,13 +6,8 @@
     RANKS = [];
 
     WITNESSES = {
+        "Ryan X. Charles": true,
         "clemens": true, 
-        "codemojo": true,
-        "creative.mind": true, 
-        "bend0ver": true,
-        "kakashi": true, 
-        "mooncryption": true, 
-        "Satchmo": true, 
     }
 
     function calc(nodes, cb) {
@@ -21,7 +16,7 @@
         tolerance = 0.0001 //sensitivity for accuracy of convergence. 
 
         console.log(nodes);
-
+        RANKS = [];
         PR = new Pagerank(nodes, linkProb, tolerance, function(err, res) {
             RESULT = res;
             
@@ -51,6 +46,7 @@
     }
 
     function render() {
+        $(".rank-container table").html("");
         $.each(RANKS, function(id, rank) {
         
             $(".rank-container table").append("<tr><td>" + rank[0] + "</td><td>" + rank[1] + "</td><td>" + rank[2] + "</td><td>" + ID_TO_NAME[rank[3]] + "</td></tr>");
@@ -62,20 +58,27 @@
             $.each(data.nodes, function(id, node) {
                 NAME_TO_ID[node.caption] = null;
             })
+            $.each(data.edges, function(id, edge) {
+                NAME_TO_ID[edge.source] = null;
+                NAME_TO_ID[edge.target] = null;
+            })
 
             var count = 0;
             $.each(NAME_TO_ID, function(name, id) {
                 NAME_TO_ID[name] = count;
-                ID_TO_VOTES[count] = 0;
-                if (WITNESSES[name]) {
-                    ID_TO_VOTES[count] += Object.keys(NAME_TO_ID).length;
-                }
                 ID_TO_NAME[count] = name;
+                count++;
+            })
+
+            $.each(NAME_TO_ID, function(name, id) {            
+                ID_TO_VOTES[id] = 0;
+                if (WITNESSES[name]) {
+                    ID_TO_VOTES[id] += Object.keys(NAME_TO_ID).length;
+                }
                 NODES.push([]);
                 $.each(WITNESSES, function(witness_name, foo) {
                     NODES[NODES.length - 1].push(NAME_TO_ID[witness_name])
                 })                
-                count++;
             })
             
             $.each(data.edges, function(id, edge) {

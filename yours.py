@@ -24,10 +24,11 @@ class YoursPost(ndb.Expando):
           
         data = json.loads(urlopen("https://www.yours.org/api/contents/home/all/hot/0").read())
         for row in data:
-            obj = cls.get_by_id(row["titleUrlString"])
+            obj = cls.get_by_id(row["id"])
             if not obj:
-                obj = cls(id=row["titleUrlString"])
-                
+                obj = cls(id=row["id"])
+            
+            obj.id = row["id"]
             obj.createdAt = row["createdAt"]
             obj.userName = row["userName"]
             obj.userNameUrlString = row["userNameUrlString"]
@@ -35,7 +36,8 @@ class YoursPost(ndb.Expando):
             obj.titleUrlString = row["titleUrlString"]
             obj.data = json.dumps(row)
             
-            extra = json.loads(urlopen("https://www.yours.org/api/contents/id/%s" % obj.titleUrlString).read())
+            print "https://www.yours.org/api/contents/id/%s" % obj.id
+            extra = json.loads(urlopen("https://www.yours.org/api/content/id/%s" % obj.id).read())
             obj.worthPayingFor = extra["content"]["worthPayingFor"]                        
             obj.notWorthPayingFor = extra["content"]["notWorthPayingFor"]
             obj.put()
