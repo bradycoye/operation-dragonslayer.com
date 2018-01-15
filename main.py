@@ -5,7 +5,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 from datetime import datetime, timedelta
 import json
-from urllib import urlopen
+from urllib import urlopen, urlencode
 import re
 
 from flask import Flask
@@ -83,10 +83,10 @@ def fetch_url(url, data=None):
         'https': 'http://%s@us-wa.proxymesh.com:31280' % proxy_auth
     }
     if data is None:
-        response = requests.get(url, proxies=proxies)
+        response = urlopen(url, proxies=proxies).read()
     else:
-        response = requests.post(url, data=data, proxies=proxies)
-    return response.text
+        response = urlopen(url, data=urlencode(data), proxies=proxies).read()
+    return response
     
 # -- predictions
 @app.route('/' + predictions_url)
@@ -101,14 +101,14 @@ def predictions_compare_reddits():
 @app.route('/predictions/marketcap/currencies/<coin>/<ts1>/<ts2>/')
 def predictions_marketcap(coin, ts1, ts2):
     try:
-        data = json.loads(urlopen("https://graphs.coinmarketcap.com/currencies/%s/%s/%s/" % (coin, ts1, ts2)).read())
+        data = json.loads(fetch_url("https://graphs.coinmarketcap.com/currencies/%s/%s/%s/" % (coin, ts1, ts2)))
         return jsonify(data)
     except Exception, e:
         return jsonify({'error': e})
 
 @app.route('/predictions/subreddit/<coin>')
 def predictions_subreddit(coin):
-    html = urlopen("https://coinmarketcap.com/currencies/%s/" % (coin)).read()
+    html = fetch_url("https://coinmarketcap.com/currencies/%s/" % (coin))
     matches = re.findall("https://www.reddit.com/r/(.+).embed", html)
     if matches:
         subreddit = matches[0]
