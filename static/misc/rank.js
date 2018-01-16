@@ -91,6 +91,9 @@
 
     function update_with_flow(ranks) {
         $.each(ranks, function(id, data) {
+            if (WITNESSES[data.name]) {
+                return;
+            }
             if (data.rank > MAX_RANK) {
                 MAX_RANK = data.rank
             }
@@ -166,7 +169,9 @@
     
         $(".rank-container table tbody").html("");
         $.each(RANK_LIST, function(id, rank) {
-        
+            if (WITNESSES[rank.name]) {
+                return;
+            }
             $(".rank-container table tbody").append("<tr><td>"
                 + rank.flow + "</td><td>"
                 + rank.rank + "</td><td>"

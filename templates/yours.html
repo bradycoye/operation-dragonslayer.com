@@ -63,6 +63,9 @@
                                 return;
                             }
                             */
+                            if (WITNESSES[rank.name]) {
+                                return;
+                            }
                             if ($(this).find("text").text() == rank.name) {
                                 $(this).find("text").text(rank.name + " (" + rank.flow + ")");
                             };
