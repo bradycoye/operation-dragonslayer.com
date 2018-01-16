@@ -11,6 +11,15 @@
     crossorigin="anonymous">
   </script>
 
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+  
+  <script src="/static/jquery.flot.js"></script>
+  <script src="/static/jquery.flot.time.js"></script>
+  <script src="/static/jquery.flot.dashes.js"></script>
+
+  <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+
   <script src="/static/misc/pagerank.js"></script>
   <script src="/static/misc/rank.js"></script>
   
@@ -18,21 +27,37 @@
 
 <body>
 
+<h3>Yours.org Flow</h3>
 <div class="rank-container">
     <table>
       <thead>
         <tr>
             <th>
-               score
+                Flow
             </th>
             <th>
-               score (relative)
+                Rank
             </th>
             <th>
-               score (absolute)
+                Weight
             </th>
             <th>
-                name
+                Votes (IN)
+            </th>
+            <th>
+                Votes (OUT)
+            </th>
+            <th>
+                Rank (LOG2)
+            </th>
+            <th>
+                Rank (REL)
+            </th>
+            <th>
+                Rank (ABS)
+            </th>
+            <th>
+                Name
             </th>
         </tr>
       </thead>
@@ -41,11 +66,15 @@
     </table>
 </div>
 
+<h4>Weight per Votes (IN)</h4>
+<div class="gauss-container" style="height: 300px;">
+</div>
+
 <script type="text/javascript">
 
 
     $(function() {
-        run(render);
+        run(render);        
     })
 
 </script>
