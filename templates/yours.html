@@ -53,7 +53,7 @@
                 alchemy = new Alchemy(config);
 
                 setTimeout(function() {
-                    $.each(RANKS, function(id, rank) {
+                    $.each(RANK_LIST, function(id, rank) {
                         $("g.node").each(function() {
                             /*
                             if ($(this).find("text").text() == 'Ryan X. Charles') {
@@ -63,8 +63,8 @@
                                 return;
                             }
                             */
-                            if ($(this).find("text").text() == ID_TO_NAME[rank[3]]) {
-                                $(this).find("text").text(ID_TO_NAME[rank[3]] + " (" + rank[0] + ")");
+                            if ($(this).find("text").text() == rank.name) {
+                                $(this).find("text").text(rank.name + " (" + rank.flow + ")");
                             };
                         })
                     })                        
